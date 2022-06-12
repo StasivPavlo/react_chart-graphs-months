@@ -28,7 +28,8 @@ export const InputsChart: React.FC<Props> = ({ onValueMonth, onLabelMonth }) => 
     setValueMonthsError(false);
     setValueMonths(value);
 
-    const re = /^[,0-9]+$/;
+    // FIXME: rename
+    const re = /^[-,0-9]+$/;
 
     if (!re.test(value)) {
       setValueMonthsError(true);

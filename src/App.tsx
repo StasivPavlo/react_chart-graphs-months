@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { InputsChart } from './components/InputsChart';
 import './App.scss';
+import { MonthChart } from './components/MonthChart/MonthChart';
 
 export const App: React.FC = () => {
   const [labelMonths, setLabelMonths] = useState<string[]>([]);
@@ -13,15 +14,14 @@ export const App: React.FC = () => {
   };
 
   const addValueMonth = (value: string) => {
-    const months = value.split(',').map((month: string) => Number(month.trim()));
+    const months: number[] = value.split(',').map((month: string) => Number(month.trim()));
 
-    setValueMonths(months);
+    if (months.length > labelMonths.length) {
+      setValueMonths(months.slice(0, labelMonths.length));
+    } else {
+      setValueMonths(months);
+    }
   };
-
-  // eslint-disable-next-line no-console
-  console.log(labelMonths);
-  // eslint-disable-next-line no-console
-  console.log(valueMonths);
 
   return (
     <div className="App">
@@ -29,6 +29,8 @@ export const App: React.FC = () => {
         onLabelMonth={addLabelMonth}
         onValueMonth={addValueMonth}
       />
+
+      <MonthChart labels={labelMonths} values={valueMonths} />
     </div>
   );
 };
