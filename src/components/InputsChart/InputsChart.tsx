@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
+import './InputsChart.scss';
 
 interface Props {
   onValueMonth: (value: string) => void;
   onLabelMonth: (value: string) => void;
 }
 
-export const InputsChart: React.FC<Props> = ({ onValueMonth, onLabelMonth }) => {
+export const InputsChart = React.memo<Props>(({ onValueMonth, onLabelMonth }) => {
   const [labelMonth, setLabelMonths] = useState('');
   const [valueMonth, setValueMonths] = useState('');
   const [valueMonthDirty, setValueMonthsDirty] = useState(false);
-  const [valueMonthError, setValueMonthsError] = useState(true);
+  const [valueMonthError, setValueMonthsError] = useState(false);
   const [labelMonthDirty, setLableMonthsDirty] = useState(false);
-  const [labelMonthError, setLableMonthsError] = useState(true);
+  const [labelMonthError, setLableMonthsError] = useState(false);
 
   const changeLabelMonth = (label: string) => {
     setLableMonthsDirty(false);
@@ -28,71 +30,73 @@ export const InputsChart: React.FC<Props> = ({ onValueMonth, onLabelMonth }) => 
     setValueMonthsError(false);
     setValueMonths(value);
 
-    // FIXME: rename
-    const re = /^[-,0-9]+$/;
+    const regExp = /^[ -,0-9]+$/;
 
-    if (!re.test(value)) {
+    if (!regExp.test(value)) {
       setValueMonthsError(true);
     }
   };
 
-  const inputBlure = (name: string) => {
-    switch (name) {
-      case 'inputLabelX':
-        setLableMonthsDirty(true);
-        if (!labelMonthError) {
-          onLabelMonth(labelMonth);
-        }
+  const submitLable = () => {
+    setLableMonthsDirty(true);
+    if (!labelMonthError) {
+      onLabelMonth(labelMonth);
+    }
+  };
 
-        break;
-
-      case 'inputValueY':
-        setValueMonthsDirty(true);
-        if (!valueMonthError) {
-          onValueMonth(valueMonth);
-        }
-
-        break;
-
-      default:
+  const submitValue = () => {
+    setValueMonthsDirty(true);
+    if (!valueMonthError) {
+      onValueMonth(valueMonth);
     }
   };
 
   return (
-    <>
+    <form
+      className="chart__inputs"
+      onSubmit={(event) => {
+        event.preventDefault();
+        submitLable();
+        submitValue();
+      }}
+    >
       <label htmlFor="inputLabelX">
-        X
+        X axis labels:
         <input
           type="text"
           id="inputLabelX"
+          className={classNames('input', { 'input--error': labelMonthError })}
           name="inputLabelX"
           placeholder="September, November..."
           value={labelMonth}
-          onBlur={(event) => inputBlure(event.target.name)}
+          onBlur={submitLable}
           onChange={(event) => changeLabelMonth(event.target.value)}
         />
 
         {labelMonthDirty && labelMonthError && (
-          <span style={{ color: 'red' }}>Please input correctly</span>
+          <span className="input__message-error">Please input correctly</span>
         )}
       </label>
 
       <label htmlFor="inputValueY">
-        Y
+        Y axis values:
         <input
           type="text"
           id="inputValueY"
+          className={classNames('input', { 'input--error': valueMonthError })}
           name="inputValueY"
           placeholder="1, 2, 3..."
           value={valueMonth}
-          onBlur={(event) => inputBlure(event.target.name)}
+          onBlur={submitValue}
           onChange={(event) => changeValueMonth(event.target.value)}
         />
 
         {valueMonthDirty && valueMonthError && (
-          <span style={{ color: 'red' }}>Please input correctly</span>
+          <span className="input__message-error">Please input correctly</span>
         )}
       </label>
-    </>
+
+      <button hidden type="submit">Submit</button>
+    </form>
   );
-};
+});
